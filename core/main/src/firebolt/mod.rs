@@ -41,6 +41,7 @@ pub mod handlers {
     pub mod user_grants_rpc;
     pub mod voice_guidance_rpc;
     pub mod wifi_rpc;
+    pub mod test_rpc;
 }
 pub mod firebolt_gatekeeper;
 pub mod firebolt_gateway;

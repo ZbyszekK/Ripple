@@ -115,6 +115,7 @@
       "xrn:firebolt:capability:token:session",
       "xrn:firebolt:capability:token:platform",
       "xrn:firebolt:capability:token:device",
+      "xrn:firebolt:capability:test:test",
       "xrn:firebolt:capability:token:root"
     ]
   },

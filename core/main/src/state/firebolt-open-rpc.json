@@ -887,6 +887,21 @@
 		  "public": false,
 		  "negotiable": false
 		}
+	  },
+	  "xrn:firebolt:capability:test:test": {
+		"level": "must",
+		"use": {
+		   "public": true,
+		   "negotiable": true
+		},
+		"manage": {
+		   "public": false,
+		   "negotiable": false
+		},
+		"provide": {
+		   "public": false,
+		   "negotiable": false
+		}
 	  }
 	},
 	"apis": {
@@ -6870,6 +6885,29 @@
 				}
 			  }
 			]
+		  },
+		  {
+			"name": "test.test",
+			"tags": [
+			  {
+				"name": "property:readonly"
+			  },
+			  {
+				"name": "capabilities",
+				"x-uses": [
+				  "xrn:firebolt:capability:test:test"
+				]
+			  }
+			],
+			"summary": "Test if we can extend the FB API easly",
+			"params": [],
+			"result": {
+			  "name": "success",
+			  "summary": "echo responce",
+			  "schema": {
+				"type": "string"
+			  }
+			}
 		  },
 		  {
 			"name": "metrics.ready",
