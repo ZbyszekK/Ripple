@@ -125,6 +125,7 @@
         "xrn:firebolt:capability:privacy:advertising",
         "xrn:firebolt:capability:metrics:general",
         "xrn:firebolt:capability:metrics:media",
+        "xrn:firebolt:capability:test:test",
         "xrn:firebolt:capability:token:root"
     ],
     "comcast.test.firecert" : [

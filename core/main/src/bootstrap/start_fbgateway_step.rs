@@ -31,6 +31,7 @@ use crate::{
             second_screen_rpc::SecondScreenRPCProvider,
             secure_storage_rpc::SecureStorageRPCProvider, user_grants_rpc::UserGrantsRPCProvider,
             voice_guidance_rpc::VoiceguidanceRPCProvider, wifi_rpc::WifiRPCProvider,
+            test_rpc::TestRPCProvider,
         },
         rpc::RippleRPCProvider,
     },
@@ -67,6 +68,7 @@ impl FireboltGatewayStep {
         let _ = methods.merge(DiscoveryRPCProvider::provide_with_alias(state.clone()));
         let _ = methods.merge(AuthRPCProvider::provide_with_alias(state.clone()));
         let _ = methods.merge(AccountRPCProvider::provide_with_alias(state.clone()));
+        let _ = methods.merge(TestRPCProvider::provide_with_alias(state.clone()));
 
         // LCM Api(s) not required for internal launcher
         if !state.has_internal_launcher() {
