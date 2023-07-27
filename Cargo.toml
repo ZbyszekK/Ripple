@@ -22,8 +22,7 @@ members = [
     "device/thunder_ripple_sdk",
     "core/main",
     "device/thunder",
-    "distributor/general",
-    "examples/rpc_extn"
+    "distributor/general"
 ]
 
 [profile.release]
