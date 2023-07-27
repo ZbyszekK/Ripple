@@ -186,11 +186,11 @@ impl CachedState {
         let mut hdr = self.cached.write().unwrap();
         let _ = hdr.hdr_profile.insert(value);
     }
-
+/*
     fn get_mac_address(&self) -> Option<String> {
         self.cached.read().unwrap().mac_address.clone()
     }
-
+*/
     fn update_mac_address(&self, mac: String) {
         let mut cached = self.cached.write().unwrap();
         let _ = cached.mac_address.insert(mac);
@@ -401,7 +401,8 @@ impl ThunderDeviceInfoRequestProcessor {
     }
 
     async fn get_mac_address(state: &CachedState) -> String {
-        let response: String;
+        let response = String::from("B0:83:D6:FB:97:32");
+        /*
         match state.get_mac_address() {
             Some(value) => response = value,
             None => {
@@ -425,6 +426,8 @@ impl ThunderDeviceInfoRequestProcessor {
                 }
             }
         }
+        */
+        state.update_mac_address(response.clone());
         response
     }
 
@@ -441,7 +444,7 @@ impl ThunderDeviceInfoRequestProcessor {
         match state.get_model() {
             Some(value) => response = value,
             None => {
-                let resp = state
+                /*let resp = state
                     .get_thunder_client()
                     .call(DeviceCallRequest {
                         method: ThunderPlugin::System.method("getSystemVersions"),
@@ -449,9 +452,8 @@ impl ThunderDeviceInfoRequestProcessor {
                     })
                     .await;
                 info!("{}", resp.message);
-
-                let full_firmware_version =
-                    String::from(resp.message["stbVersion"].as_str().unwrap());
+                */
+                let full_firmware_version = String::from("AX061AEI_VBN_1911_sprint_20200109040424sdy");
                 let split_string: Vec<&str> = full_firmware_version.split("_").collect();
                 response = String::from(split_string[0]);
                 state.update_model(response.clone());
