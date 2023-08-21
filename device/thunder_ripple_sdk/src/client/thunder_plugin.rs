@@ -36,7 +36,7 @@ pub enum ThunderPlugin {
     Telemetry,
 }
 const CONTROLLER_CFG: Cfg = Cfg::new("Controller", false, true);
-const DEVICE_INFO_CFG: Cfg = Cfg::new("DeviceInfo", true, false);
+const DEVICE_INFO_CFG: Cfg = Cfg::new("DeviceInfo", false, false);
 const DISPLAY_SETTINGS_CFG: Cfg = Cfg::new("org.rdk.DisplaySettings", true, false);
 const HDCP_CFG: Cfg = Cfg::new("org.rdk.HdcpProfile", true, false);
 const NETWORK_CFG: Cfg = Cfg::new("org.rdk.Network", true, false);

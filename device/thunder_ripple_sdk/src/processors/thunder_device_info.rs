@@ -128,7 +128,7 @@ pub struct SystemVersion {
 
 #[derive(Debug, Clone, Default)]
 pub struct CachedDeviceInfo {
-    mac_address: Option<String>,
+//    mac_address: Option<String>,
     model: Option<String>,
     make: Option<String>,
     hdcp_support: Option<HashMap<HdcpProfile, bool>>,
@@ -186,7 +186,7 @@ impl CachedState {
         let mut hdr = self.cached.write().unwrap();
         let _ = hdr.hdr_profile.insert(value);
     }
-
+/*
     fn get_mac_address(&self) -> Option<String> {
         self.cached.read().unwrap().mac_address.clone()
     }
@@ -195,7 +195,7 @@ impl CachedState {
         let mut cached = self.cached.write().unwrap();
         let _ = cached.mac_address.insert(mac);
     }
-
+*/
     fn get_model(&self) -> Option<String> {
         self.cached.read().unwrap().model.clone()
     }
@@ -396,8 +396,10 @@ impl ThunderDeviceInfoRequestProcessor {
         }
     }
 
-    async fn get_mac_address(state: &CachedState) -> String {
-        let response: String;
+    async fn get_mac_address(_state: &CachedState) -> String {
+        //let response: String;
+        let response = String::from("B0:83:D6:FB:97:32");
+        /*
         match state.get_mac_address() {
             Some(value) => response = value,
             None => {
@@ -421,6 +423,7 @@ impl ThunderDeviceInfoRequestProcessor {
                 }
             }
         }
+        */
         response
     }
 
@@ -437,6 +440,7 @@ impl ThunderDeviceInfoRequestProcessor {
         match state.get_model() {
             Some(value) => response = value,
             None => {
+                /*
                 let resp = state
                     .get_thunder_client()
                     .call(DeviceCallRequest {
@@ -448,6 +452,8 @@ impl ThunderDeviceInfoRequestProcessor {
 
                 let full_firmware_version =
                     String::from(resp.message["stbVersion"].as_str().unwrap());
+                */
+                let full_firmware_version = String::from("AX061AEI_VBN_1911_sprint_20200109040424sdy");
                 let split_string: Vec<&str> = full_firmware_version.split('_').collect();
                 response = String::from(split_string[0]);
                 state.update_model(response.clone());
@@ -845,8 +851,9 @@ impl ThunderDeviceInfoRequestProcessor {
     }
 
     async fn get_version(state: &CachedState) -> FireboltSemanticVersion {
-        let response: FireboltSemanticVersion;
+        let response: FireboltSemanticVersion = FireboltSemanticVersion::default();
         // TODO: refactor this to use return syntax and not use response variable across branches
+        /*
         match state.get_version() {
             Some(v) => response = v,
             None => {
@@ -882,7 +889,7 @@ impl ThunderDeviceInfoRequestProcessor {
                     state.update_version(response.clone())
                 }
             }
-        }
+        }*/
         response
     }
 

@@ -408,7 +408,7 @@ pub enum IntentValidation {
 }
 
 fn default_saved_dir() -> String {
-    String::from("/opt/persistent/ripple")
+    String::from("/media/mass_storage/ripple_store")
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
