@@ -21,7 +21,7 @@ use crate::processors::{
     thunder_browser::ThunderBrowserRequestProcessor,
     thunder_device_info::ThunderDeviceInfoRequestProcessor,
     thunder_events::ThunderOpenEventsProcessor,
-    thunder_persistent_store::ThunderStorageRequestProcessor,
+    thunder_persistent_store_stub::ThunderStorageRequestProcessor,
     thunder_remote::ThunderRemoteAccessoryRequestProcessor,
     thunder_wifi::ThunderWifiRequestProcessor,
     thunder_window_manager::ThunderWindowManagerRequestProcessor,
@@ -47,6 +47,7 @@ impl SetupThunderProcessor {
         extn_client.add_request_processor(ThunderRemoteAccessoryRequestProcessor::new(
             state.clone().state,
         ));
+
         extn_client.add_request_processor(ThunderOpenEventsProcessor::new(state.state));
     }
 }

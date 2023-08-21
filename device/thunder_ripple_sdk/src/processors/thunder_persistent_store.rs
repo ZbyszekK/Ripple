@@ -199,7 +199,7 @@ impl ThunderStorageRequestProcessor {
                         state.get_client(),
                         req.clone(),
                         ExtnResponse::StorageData(v),
-                    )
+                    )l
                     .await
                     .is_ok();
                 }
