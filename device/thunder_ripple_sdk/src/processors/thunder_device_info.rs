@@ -134,7 +134,7 @@ pub struct CachedDeviceInfo {
     hdcp_support: Option<HashMap<HdcpProfile, bool>>,
     hdcp_status: Option<HDCPStatus>,
     hdr_profile: Option<HashMap<HdrProfile, bool>>,
-    version: Option<FireboltSemanticVersion>,
+//    version: Option<FireboltSemanticVersion>,
     all_timezones: Option<ThunderAllTimezonesResponse>,
 }
 
@@ -213,7 +213,7 @@ impl CachedState {
         let mut cached = self.cached.write().unwrap();
         let _ = cached.make.insert(make);
     }
-
+/*
     fn get_version(&self) -> Option<FireboltSemanticVersion> {
         self.cached.read().unwrap().version.clone()
     }
@@ -222,7 +222,7 @@ impl CachedState {
         let mut cached = self.cached.write().unwrap();
         let _ = cached.version.insert(version);
     }
-
+*/
     fn update_timezone(&self, timezones: ThunderAllTimezonesResponse) {
         let mut cached = self.cached.write().unwrap();
         let _ = cached.all_timezones.insert(timezones);
@@ -850,7 +850,7 @@ impl ThunderDeviceInfoRequestProcessor {
             .is_ok()
     }
 
-    async fn get_version(state: &CachedState) -> FireboltSemanticVersion {
+    async fn get_version(_state: &CachedState) -> FireboltSemanticVersion {
         let response: FireboltSemanticVersion = FireboltSemanticVersion::default();
         // TODO: refactor this to use return syntax and not use response variable across branches
         /*
