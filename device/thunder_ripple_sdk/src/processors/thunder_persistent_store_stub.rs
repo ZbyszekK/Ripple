@@ -18,7 +18,6 @@
 use crate::{
     ripple_sdk::{
         api::device::{
-            device_operator::{DeviceCallRequest, DeviceChannelParams, DeviceOperator},
             device_peristence::{DevicePersistenceRequest, GetStorageProperty, SetStorageProperty},
         },
         async_trait::async_trait,
@@ -27,20 +26,14 @@ use crate::{
             client::extn_processor::{
                 DefaultExtnStreamer, ExtnRequestProcessor, ExtnStreamProcessor, ExtnStreamer,
             },
-            extn_client_message::{ExtnMessage, ExtnRequest, ExtnResponse},
+            extn_client_message::{ExtnMessage, ExtnResponse},
         },
-        log::{debug, error, info},
-        serde_json::{self, json, Value},
+        log::{info},
+        serde_json::{self, Value},
         tokio::sync::mpsc,
-        utils::error::RippleError,
     },
     thunder_state::ThunderState,
 };
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-
-//ask for synch troubles
-//static mut storage: HashMap<String, String> = HashMap::new();
 
 #[derive(Debug)]
 pub struct ThunderStorageRequestProcessor {
@@ -60,22 +53,12 @@ impl ThunderStorageRequestProcessor {
     async fn delete_key(self, namespace: String, key: String) -> bool {
         let merged_key: String = format!("{}.{}", namespace, key);
         info!("ZK delete_key : {:?}", merged_key);
-/*        match storage.remove(&merged_key) {
-            None => false,
-            Some(_t) => true,
-        }
-*/
         true
     }
 
     #[allow(dead_code)]
     async fn delete_namespace(self, namespace: String) -> bool {
         info!("ZK delete_namespace : {:?}", namespace);
-/*
-        storage.retain(|key, value| {
-            !key.starts_with(&namespace)
-        });
-*/
         true
     }
 
@@ -83,7 +66,6 @@ impl ThunderStorageRequestProcessor {
     async fn flush_cache(self) -> bool {
         info!("ZK flush_cache");
         true
-        //TODO flush to disk
     }
 
     async fn get_value(state: ThunderState, req: ExtnMessage, data: GetStorageProperty) -> bool {
@@ -91,8 +73,6 @@ impl ThunderStorageRequestProcessor {
         info!("ZK get_value : {:?}", merged_key);
         match merged_key.as_str() {
             "Localization.language" => {
-                //let Ok(v) = serde_json::to_value("En");
-                //let resp = r#"{"value":"En","success":"true"}"#;
                 let resp = r#"{"value":"En"}"#;
                 let parsed_res: Result<Value, serde_json::Error> = serde_json::from_str(resp);
                 println!("{:#?}", parsed_res);
