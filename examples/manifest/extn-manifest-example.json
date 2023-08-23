@@ -35,12 +35,25 @@
                         "permissions",
                         "account_session",
                         "secure_storage",
-                        "advertising",
                         "privacy_settings",
                         "metrics",
                         "session_token",
                         "discovery",
                         "media_events"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "libdistributor_liberty",
+            "symbols": [
+                {
+                    "id": "ripple:channel:distributor:liberty",
+                    "uses": [
+                        "config"
+                    ],
+                    "fulfills": [
+                        "advertising"
                     ]
                 }
             ]
