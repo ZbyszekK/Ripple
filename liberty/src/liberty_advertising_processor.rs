@@ -17,6 +17,7 @@
 //
 
 use ripple_sdk::{
+    serde::{Deserialize, Serialize},
     api::firebolt::fb_advertising::{
         AdIdResponse, AdInitObjectResponse, AdvertisingRequest, AdvertisingResponse,
     },
@@ -33,10 +34,35 @@ use ripple_sdk::{
     log::error,
 };
 
+use dbus::blocking::Connection;
+use std::time::Duration;
+use tungstenite::{connect, Message};
+
 pub struct DistributorAdvertisingProcessor {
     client: ExtnClient,
     streamer: DefaultExtnStreamer,
 }
+
+#[derive(Serialize, Deserialize)]
+struct IfaceFResponce {
+    result: String,
+}
+
+pub fn extract_cpeid(input: &str) -> String {
+    // responce from IfaceF is in fromat <method/name>:<correct JSON>
+    let index = input.find(":");
+    let (_first, last) = input.split_at(index.unwrap()+1);
+    let value: IfaceFResponce = serde_json::from_str(last).expect("JSON was not well-formatted");
+    return value.result;
+}
+
+pub fn list_net_iface() -> Vec<String> {
+    let c: Connection = Connection::new_session().unwrap();
+    let proxy = c.with_proxy("com.lgi.rdk.utils.networkconfig1", "/com/lgi/rdk/utils/networkconfig1", Duration::from_millis(5000));
+    let (_count,names,): (u32, Vec<String>,) = proxy.method_call("com.lgi.rdk.utils.networkconfig1", "GetInterfaces", ()).unwrap();
+    return names;
+}
+
 
 impl DistributorAdvertisingProcessor {
     pub fn new(client: ExtnClient) -> DistributorAdvertisingProcessor {
@@ -45,6 +71,21 @@ impl DistributorAdvertisingProcessor {
             streamer: DefaultExtnStreamer::new(),
         }
     }
+
+    pub async fn retrive_cpeid() -> String {
+
+        let addr = "ws://127.0.0.1:10415";
+        let command = r#"configuration/getConfig:{"payload":"cpe.id"}"#;
+        
+        let (mut socket, _response) = connect(addr).unwrap();
+        error!("Connected to the server");
+
+        socket.send(Message::Text(command.into())).unwrap();
+        let msg = socket.read().expect("Error reading message");
+        error!("Received: {}", msg);
+
+        return extract_cpeid(msg.into_text().unwrap().as_str());
+	}     
 }
 
 impl ExtnStreamProcessor for DistributorAdvertisingProcessor {
@@ -97,27 +138,33 @@ impl ExtnRequestProcessor for DistributorAdvertisingProcessor {
                 true
             }
             AdvertisingRequest::GetAdInitObject(_as_init_obj) => {
-                error!("ZK GetAdInitObject Liberty");
-                let resp = AdInitObjectResponse{
-                    ad_server_url: "https://demo.v.fwmrm.net/ad/p/1".into(),
-                    ad_server_url_template: "https://demo.v.fwmrm.net/ad/p/1?flag=+sltp+exvt+slcb+emcr+amcb+aeti&prof=12345:caf_allinone_profile &nw=12345&mode=live&vdur=123&caid=a110523018&asnw=372464&csid=gmott_ios_tablet_watch_live_ESPNU&ssnw=372464&vip=198.205.92.1&resp=vmap1&metr=1031&pvrn=12345&vprn=12345&vcid=1X0Ce7L3xRWlTeNhc7br8Q%3D%3D".into(),
-                    ad_network_id: "519178".into(),
-                    ad_profile_id: "12345:caf_allinone_profile".into(),
-                    ad_site_section_id: "caf_allinone_profile_section".into(),
+
+                // Currently no IfA defined for apollo V1+, let re use this method to test communication and 
+                // obtain some values from DBus 
+                error!("Liberty - no Ifa implementation, this is DBus test connection method");
+                let iface_list: Vec<String> = list_net_iface();
+                assert_eq!(iface_list.len(), 2);
+
+                let resp = AdInitObjectResponse {
+                    ad_server_url: iface_list[0].clone(),
+                    ad_server_url_template: iface_list[1].clone(),
+                    ad_network_id: "".into(),
+                    ad_profile_id: "".into(),
+                    ad_site_section_id: "".into(),
                     ad_opt_out: true,
                     // Mock invalidated token for schema validation
-                    privacy_data: "ew0KICAicGR0IjogImdkcDp2MSIsDQogICJ1c19wcml2YWN5IjogIjEtTi0iLA0KICAibG10IjogIjEiIA0KfQ0K".into(),
-                    ifa_value: "01234567-89AB-CDEF-GH01-23456789ABCD".into(),
+                    privacy_data: "".into(),
+                    ifa_value: "".into(),
                     // Mock invalidated token for schema validation
-                    ifa: "ewogICJ2YWx1ZSI6ICIwMTIzNDU2Ny04OUFCLUNERUYtR0gwMS0yMzQ1Njc4OUFCQ0QiLAogICJpZmFfdHlwZSI6ICJzc3BpZCIsCiAgImxtdCI6ICIwIgp9Cg==".into(),
-                    app_name: "FutureToday".into(),
+                    ifa: "".into(),
+                    app_name: "".into(),
                     app_version: "".into(),
-                    app_bundle_id: "FutureToday.comcast".into(),
-                    distributor_app_id: "1001".into(),
-                    device_ad_attributes: "ewogICJib0F0dHJpYnV0ZXNGb3JSZXZTaGFyZUlkIjogIjEyMzQiCn0=".into(),
+                    app_bundle_id: "".into(),
+                    distributor_app_id: "".into(),
+                    device_ad_attributes: "".into(),
                     coppa: 0.to_string(),
-                    authentication_entity: "60f72475281cfba3852413bd53e957f6".into(),
-            };
+                    authentication_entity: "".into(),
+                };
 
                 if let Err(e) = state
                     .clone()
@@ -142,10 +189,17 @@ impl ExtnRequestProcessor for DistributorAdvertisingProcessor {
             }
 
             AdvertisingRequest::GetAdIdObject(_ad_id_req) => {
-                error!("ZK GetAdIdObject Liberty");
+
+                // Currently na IfA defined for apollo V1+, let re use this method to test communication and 
+                // obtain some values from IfaceF with web sockets
+
+                error!("Liberty - no Ifa implementation, this is WebSocket Iface F test connection method");
+
+                let myifa = DistributorAdvertisingProcessor::retrive_cpeid().await;
+
                 let resp = AdIdResponse {
-                    ifa: "01234567-89AB-CDEF-GH01-23456789ABCD".into(),
-                    ifa_type: "idfa".into(),
+                    ifa: myifa.into(),
+                    ifa_type: "".into(),
                     lmt: "0".into(),
                 };
                 if let Err(e) = state
