@@ -22,18 +22,14 @@ members = [
     "core/tdk",
     "device/thunder_ripple_sdk",
     "core/main",
-    "core/launcher",
     "device/thunder",
-    "distributor/general",
-    "examples/rpc_extn",
-    "examples/tm_extn",
+    "distributor/general"
 ]
 
 [profile.release]
 strip = true
 opt-level = "z"
 lto = true
-panic = "abort"
 
 [workspace.package]
 version = "0.8.0"
