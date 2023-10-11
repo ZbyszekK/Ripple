@@ -40,6 +40,7 @@ use ripple_sdk::{
 use crate::{
     liberty_advertising_processor::DistributorAdvertisingProcessor,
     liberty_persistent_store_processor::PersistentStorageRequestProcessor,
+    liberty_persistent_store_processor::PersistentStoreEventProcessor,
 };
 
 fn init_library() -> CExtnMetadata {
@@ -50,6 +51,7 @@ fn init_library() -> CExtnMetadata {
         ContractFulfiller::new(vec![
             RippleContract::Advertising,
             RippleContract::Storage(StorageAdjective::Local),
+            RippleContract::StorageEvents,
         ]),
         Version::new(1, 1, 0),
     );
@@ -74,6 +76,7 @@ fn start_launcher(sender: ExtnSender, receiver: CReceiver<CExtnMessage>) {
         tokio::spawn(async move {
             client.add_request_processor(DistributorAdvertisingProcessor::new(client.clone()));
             client.add_request_processor(PersistentStorageRequestProcessor::new(client.clone()));
+            client.add_request_processor(PersistentStoreEventProcessor::new(client.clone()));
             // Lets Main know that the distributor channel is ready
             let _ = client.event(ExtnStatus::Ready);
         });

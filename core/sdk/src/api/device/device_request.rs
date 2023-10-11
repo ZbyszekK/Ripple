@@ -19,6 +19,7 @@ use crate::{
     api::firebolt::fb_openrpc::FireboltSemanticVersion,
     extn::extn_client_message::{ExtnEvent, ExtnPayload, ExtnPayloadProvider},
     framework::ripple_contract::RippleContract,
+    api::storage_events::StorageEventRequest,
 };
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -37,6 +38,7 @@ pub enum DeviceRequest {
     Storage(DevicePersistenceRequest),
     Wifi(WifiRequest),
     Accessory(RemoteAccessoryRequest),
+    StorageEvent(StorageEventRequest),
 }
 
 #[derive(Hash, Eq, PartialEq, Debug, Serialize, Deserialize, Clone)]

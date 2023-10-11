@@ -28,6 +28,7 @@ pub mod session;
 pub mod settings;
 pub mod status_update;
 pub mod storage_property;
+pub mod storage_events;
 pub mod usergrant_entry;
 pub mod wifi;
 

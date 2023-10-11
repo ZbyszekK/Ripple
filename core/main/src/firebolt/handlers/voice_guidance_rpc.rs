@@ -28,6 +28,7 @@ use jsonrpsee::{
     RpcModule,
 };
 
+
 use ripple_sdk::{
     api::{
         device::{
@@ -42,6 +43,10 @@ use ripple_sdk::{
         },
         firebolt::fb_general::{ListenRequest, ListenerResponse},
         gateway::rpc_gateway_api::CallContext,
+        storage_events::{
+            StorageEvent,
+            StorageEventRequest,
+        }
     },
     extn::extn_client_message::ExtnResponse,
     log::error,
@@ -163,7 +168,23 @@ pub async fn voice_guidance_settings_enabled_changed(
     ctx: &CallContext,
     request: &ListenRequest,
 ) -> RpcResult<ListenerResponse> {
+
+    //TODO correct listener registration
     let listen = request.listen;
+    let app_id = ctx.app_id.clone();
+    if platform_state
+        .get_client()
+        .send_extn_request(StorageEventRequest {
+            event: StorageEvent::ClosedCaptionsEnabledChanged,
+            id: app_id,
+            subscribe: listen,
+        })
+        .await
+        .is_err()
+    {
+        error!("Error while registration");
+    }
+
     // Register for individual change events (no-op if already registered), handlers emit VOICE_GUIDANCE_SETTINGS_CHANGED_EVENT.
     if platform_state
         .get_client()

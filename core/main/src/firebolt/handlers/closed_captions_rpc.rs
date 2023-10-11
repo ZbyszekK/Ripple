@@ -45,7 +45,12 @@ use ripple_sdk::api::{
         EVENT_CLOSED_CAPTIONS_SETTINGS_CHANGED, EVENT_CLOSED_CAPTIONS_TEXT_ALIGN,
         EVENT_CLOSED_CAPTIONS_TEXT_ALIGN_VERTICAL,
     },
+    storage_events::{
+        StorageEvent,
+        StorageEventRequest,
+    }
 };
+use ripple_sdk::log::{error};
 use serde_json::Value;
 
 #[derive(Clone)]
@@ -344,6 +349,24 @@ impl ClosedcaptionsServer for ClosedcaptionsImpl {
         ctx: CallContext,
         request: ListenRequest,
     ) -> RpcResult<ListenerResponse> {
+
+		//TODO correct listener registration
+        let listen = request.listen;
+        let app_id = ctx.app_id.clone();
+        if self
+            .state
+            .get_client()
+            .send_extn_request(StorageEventRequest {
+                event: StorageEvent::ClosedCaptionsEnabledChanged,
+                id: app_id,
+                subscribe: listen,
+            })
+            .await
+            .is_err()
+        {
+            error!("Error while registration");
+        }
+
         rpc_add_event_listener_with_decorator(
             &self.state,
             ctx,
@@ -377,6 +400,24 @@ impl ClosedcaptionsServer for ClosedcaptionsImpl {
         ctx: CallContext,
         request: ListenRequest,
     ) -> RpcResult<ListenerResponse> {
+
+        //TODO correct listener registration
+        let listen = request.listen;
+        let app_id = ctx.app_id.clone();
+        if self
+            .state
+            .get_client()
+            .send_extn_request(StorageEventRequest {
+                event: StorageEvent::ClosedCaptionsEnabledChanged,
+                id: app_id,
+                subscribe: listen,
+            })
+            .await
+            .is_err()
+        {
+            error!("Error while registration");
+        }
+
         rpc_add_event_listener(&self.state, ctx, request, EVENT_CLOSED_CAPTIONS_ENABLED).await
     }
 

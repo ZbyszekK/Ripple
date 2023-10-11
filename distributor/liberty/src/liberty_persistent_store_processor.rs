@@ -23,6 +23,11 @@ use ripple_sdk::{
             NAMESPACE_CLOSED_CAPTIONS, NAMESPACE_DEVICE_NAME, NAMESPACE_LOCALIZATION,
             KEY_ENABLED, KEY_NAME, KEY_LANGUAGE, KEY_COUNTRY_CODE, KEY_LOCALE,
         },
+        storage_events::{
+            StorageEvent,
+            StorageEventRequest,
+        },
+        device::device_request::VoiceGuidanceState,
     },
     extn::{
         client::{
@@ -31,10 +36,15 @@ use ripple_sdk::{
                 DefaultExtnStreamer, ExtnRequestProcessor, ExtnStreamProcessor, ExtnStreamer,
             },
         },
-        extn_client_message::{ExtnMessage, ExtnResponse},
+        extn_client_message::{
+            ExtnEvent,
+            ExtnMessage,
+            ExtnResponse,
+        },
     },
     serde::{Deserialize, Serialize},
     async_trait::async_trait,
+    utils::time_utils::Timer,
     utils::error::RippleError,
     log::{error, info},
 };
@@ -72,6 +82,7 @@ pub struct ApplicationServicesState {
      *      this Arc<RwLock<Wss>> is only for RW access to scocket from cloned State
      */
     socket: Arc<RwLock<Wss>>,
+    timer: Arc<RwLock<Option<Timer>>>,
 }
 
 impl ApplicationServicesState {
@@ -83,6 +94,7 @@ impl ApplicationServicesState {
         Self {
             client,
             socket: Arc::new(RwLock::new(socket)),
+            timer: Arc::new(RwLock::new(None)),
         }
     }
 }
@@ -253,3 +265,100 @@ impl ExtnRequestProcessor for PersistentStorageRequestProcessor {
         }
     }
 }
+
+
+// TODO real websocket client that register for AS notifications
+// TODO this fake event stuck on ripple core for "internal" target
+pub async fn generate_fake_event(mut state: ApplicationServicesState) {
+
+    //Storage event tryout
+    //let value = serde_json::to_value("").unwrap();
+    //let result = serde_json::to_value("false").unwrap();
+    //let event = ExtnEvent::AppEvent(AppEventRequest::Emit(AppEvent {
+    //    event_name: EVENT_CLOSED_CAPTIONS_SETTINGS_CHANGED.to_string(),
+    //    context: None,
+    //    result,
+    //    app_id: None,
+    //}));
+
+    //Let use instead some well known event instead starage event for testing
+    let event = ExtnEvent::VoiceGuidanceState(
+        VoiceGuidanceState {
+            state: false,
+        }
+    );
+
+    //TODO is this right method to pass events to Ripple core ?
+    info!("Sending fake event with request_transient() ... ");
+    let rr = state.client.request_transient(event);
+    if rr.is_err() {
+        error!("Error while forwarding cc change event");
+    } else {
+        info!("Sended !");
+    }
+}
+
+
+#[derive(Debug)]
+pub struct PersistentStoreEventProcessor {
+    state: ApplicationServicesState,
+    streamer: DefaultExtnStreamer,
+}
+
+impl PersistentStoreEventProcessor {
+    pub fn new(client: ExtnClient) -> PersistentStoreEventProcessor {
+        PersistentStoreEventProcessor {
+            state: ApplicationServicesState::new(client),
+            streamer: DefaultExtnStreamer::new(),
+        }
+    }
+}
+
+impl ExtnStreamProcessor for PersistentStoreEventProcessor {
+    type STATE = ApplicationServicesState;
+    type VALUE = StorageEventRequest;
+
+    fn get_state(&self) -> Self::STATE {
+        self.state.clone()
+    }
+
+    fn receiver(&mut self) -> ripple_sdk::tokio::sync::mpsc::Receiver<ExtnMessage> {
+        self.streamer.receiver()
+    }
+
+    fn sender(&self) -> ripple_sdk::tokio::sync::mpsc::Sender<ExtnMessage> {
+        self.streamer.sender()
+    }
+}
+
+#[async_trait]
+impl ExtnRequestProcessor for PersistentStoreEventProcessor {
+    fn get_client(&self) -> ExtnClient {
+        self.state.clone().client
+    }
+
+    async fn process_request(
+        state: Self::STATE,
+        msg: ExtnMessage,
+        extracted_message: Self::VALUE,
+    ) -> bool {
+   
+        let event = extracted_message.clone().event;
+
+        match event {
+            StorageEvent::ClosedCaptionsEnabledChanged => {
+                info!("ClosedCaptionsEnabledChanged event");
+                //Lets generate fake CaptionsEnabledChanged event in 5 second
+                *state.timer.write().unwrap() = Some(Timer::start(3000, generate_fake_event(state.clone())));
+            },
+            StorageEvent::DeviceNameChanged => {
+                info!("DeviceNameChanged event");
+                //Lets generate fake DeviceNameChanged event in 5 second
+                *state.timer.write().unwrap() = Some(Timer::start(3000, generate_fake_event(state.clone())));
+            },
+        };
+
+        Self::ack(state.clone().client, msg).await.is_ok()
+    }
+}
+

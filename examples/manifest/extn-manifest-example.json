@@ -47,7 +47,8 @@
                 {
                     "id": "ripple:channel:distributor:liberty",
                     "uses": [
-                        "config"
+                        "config",
+                        "internal"
                     ],
                     "fulfills": [
                         "advertising",

@@ -118,6 +118,7 @@ pub enum RippleContract {
     /// Distributor gets the ability to configure and customize the generation of
     /// the Session information based on their policies. Used by [crate::api::session::AccountSession]
     Session(SessionAdjective),
+    StorageEvents,
 }
 
 pub trait ContractAdjective: serde::ser::Serialize {
