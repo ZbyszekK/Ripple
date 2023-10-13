@@ -20,7 +20,7 @@ use ripple_sdk::{
     api::{
         device::device_peristence::{DevicePersistenceRequest, GetStorageProperty, SetStorageProperty, StorageData},
         storage_property::{
-            NAMESPACE_CLOSED_CAPTIONS, NAMESPACE_DEVICE_NAME, NAMESPACE_LOCALIZATION, NAMESPACE_VOICE_GUIDANCE,
+            NAMESPACE_CLOSED_CAPTIONS, NAMESPACE_DEVICE_NAME, NAMESPACE_LOCALIZATION,
             KEY_ENABLED, KEY_NAME, KEY_LANGUAGE, KEY_COUNTRY_CODE, KEY_LOCALE,
         },
     },
@@ -55,7 +55,6 @@ pub const CONNECTION_STRING: &'static str = "ws://127.0.0.1:10415";
 
 pub const PROFILE_SUBTITLES: &'static str = r#"settings/getSetting:{"payload":"profile.subControl"}"#;
 pub const PROFILE_OSD_LANG:  &'static str = r#"settings/getSetting:{"payload":"profile.osdLang"}"#;
-pub const PROFILE_TTS:       &'static str = r#"settings/getSetting:{"payload":"profile.textToSpeech"}"#;
 pub const CPE_FRIENDLY_NAME: &'static str = r#"settings/getSetting:{"payload":"cpe.friendlyName"}"#;
 pub const CPE_COUNTRY:       &'static str = r#"configuration/getConfig:{"payload":"cpe.country"}"#;
 
@@ -100,7 +99,6 @@ pub fn expected_type(token: &str) -> ApplicationServicesResponceType {
     match token {
         PROFILE_SUBTITLES => ApplicationServicesResponceType::BOOLEAN,
         PROFILE_OSD_LANG  => ApplicationServicesResponceType::STRING,
-        PROFILE_TTS       => ApplicationServicesResponceType::STRING,
         CPE_FRIENDLY_NAME => ApplicationServicesResponceType::STRING,
         CPE_COUNTRY       => ApplicationServicesResponceType::STRING,
         _ => ApplicationServicesResponceType::NONE,
@@ -126,12 +124,6 @@ pub fn translate_namespace_and_key(namespace: &str, key: &str) -> Option<&'stati
                 KEY_LANGUAGE => Some(PROFILE_OSD_LANG),
                 KEY_COUNTRY_CODE => Some(CPE_COUNTRY),
                 KEY_LOCALE => Some(PROFILE_OSD_LANG),
-                _ => None,
-            }
-        }
-        NAMESPACE_VOICE_GUIDANCE => {
-            match key {
-                KEY_ENABLED => Some(PROFILE_TTS),
                 _ => None,
             }
         }

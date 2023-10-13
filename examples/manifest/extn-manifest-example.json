@@ -32,12 +32,9 @@
                     ],
                     "fulfills": [
                         "permissions",
-                        "account_session",
-                        "secure_storage",
                         "advertising",
                         "privacy_settings",
                         "metrics",
-                        "session_token",
                         "discovery",
                         "media_events"
                     ]
@@ -54,7 +51,7 @@
                     ],
                     "fulfills": [
                         "advertising",
-                        "device_persistence"
+                        "local.storage"
                     ]
                 }
             ]
@@ -67,15 +64,11 @@
         "window_manager",
         "browser",
         "permissions",
-        "account_session",
         "wifi",
         "device_events",
-        "device_persistence",
         "remote_accessory",
-        "secure_storage",
         "advertising",
         "privacy_settings",
-        "session_token",
         "metrics",
         "discovery",
         "media_events"

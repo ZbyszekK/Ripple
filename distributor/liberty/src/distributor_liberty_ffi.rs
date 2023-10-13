@@ -18,6 +18,7 @@
 
 use ripple_sdk::{
     api::{status_update::ExtnStatus},
+    api::storage_property::StorageAdjective,
     crossbeam::channel::Receiver as CReceiver,
     export_channel_builder, export_extn_metadata,
     extn::{
@@ -48,7 +49,7 @@ fn init_library() -> CExtnMetadata {
         ExtnId::new_channel(ExtnClassId::Distributor, "liberty".into()),
         ContractFulfiller::new(vec![
             RippleContract::Advertising,
-            RippleContract::DevicePersistence,
+            RippleContract::Storage(StorageAdjective::Local),
         ]),
         Version::new(1, 1, 0),
     );
